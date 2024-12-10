@@ -1,4 +1,4 @@
-The default neuron type is multipolar, multi in, multi out.
+#The default neuron type is multipolar, multi in, multi out.
 
 Changes to make:
 Implement below neuron rulsets
