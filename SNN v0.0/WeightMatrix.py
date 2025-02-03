@@ -1,6 +1,5 @@
 import numpy as np
-from sklearn.preprocessing import MinMaxScaler
-signal_scaler = MinMaxScaler(feature_range=(0.0, 30.0))
+
 class WeightMatrix:
     def __init__(self, num_neurons, pre_alpha, post_alpha, init_type='glorot_uniform'):
         self.a_pre = pre_alpha
