@@ -2,6 +2,7 @@
 .emnet/
 */lichen/
 *.mp4
+*/mnist/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
