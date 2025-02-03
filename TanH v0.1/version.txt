@@ -1,0 +1,10 @@
+This version makes the tanh activations as a gated activation method
+Where, activation thresholds are implemented as follows:
+    TanH activation thresholds:
+        (-0.49, 0.49)
+
+Perhaps an adaptive method where:
+    The more times the TanH fires in the last n steps:
+    the higher the threshold
+        Threshold can be scaled via:
+            Thresh += thresh * 0.0271
