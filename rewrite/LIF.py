@@ -1,43 +1,64 @@
 import numpy as np
 from numba import njit
 
+def default_params():
+    params = {
+        'p'           : np.float64(-65.0),
+        'v_rest'      : np.float64(-65.0),
+        'dt'          : np.float64(0.100),
+        'v_reset'     : np.float64(-65.0),
+        'v_threshold' : np.float64(-52.0),
+        'tau'         : np.float64(100.0),
+        'tau_input'   : np.float64(2.000),
+    }
+    return
+
 @njit
-def step(params, spike):
-    p, dt, tau, v_rest, v_reset, v_threshold = params
+def step(params, I_syn, signal, refrac_counter):
+    p, dt, tau, tau_input, v_rest, v_reset, v_threshold, refrac_time = params
     """
-    Simulates a single time step of a spiking neuron model.
-    
+    Simulates a single time step of a spiking neuron model with synaptic current decay and refractory period.
+
     Args:
-        - 'p' (float): The membrane potential at the previous time step.
-        - 'spike' (float): The input current or spike input for the neuron.
-        - 'dt' (float): The time step duration.
+        - 'p' (float): Membrane potential at the previous time step.
+        - 'I_syn' (float): Synaptic input current at the previous time step.
+        - 'signal' (float): New external input.
+        - 'refrac_counter' (int): Time steps remaining in refractory period.
+        - 'dt' (float): Time step duration.
         - 'tau' (float): Membrane time constant.
+        - 'tau_input' (float): Synaptic input current decay time constant.
         - 'v_rest' (float): Resting potential.
         - 'v_reset' (float): Reset potential after a spike.
         - 'v_threshold' (float): Threshold for firing a spike.
-    
+        - 'refrac_time' (int): Duration of refractory period.
+
     Returns:
         tuple:
             - fire (bool): Whether the neuron fired a spike.
-            - new_p (float): The membrane potential after this time step.
+            - new_p (float): Updated membrane potential.
+            - new_I_syn (float): Updated synaptic input current.
+            - new_refrac_counter (int): Updated refractory counter.
     """
-    # Update membrane potential using leaky integrate-and-fire equation
-    dV = (- (p - v_rest) + spike) * (dt / tau)
-    new_p = p + dV
-    
-    # Check for firing
-    fire = new_p >= v_threshold
-    wp = new_p
-    if fire:
-        new_p = v_reset  # Reset the potential if spike occurs
-    
-    return wp, new_p
 
-def parse_params(params:dict):
-    potential = params['potential']
-    dt = params['dt']
-    tau = params['tau']
-    v_rest = params['v_rest']
-    v_reset = params['v_reset']
-    v_threshold = params['v_threshold']
-    return np.array([potential, dt, tau, v_rest,v_reset, v_threshold])
+    # Update synaptic current (exponential decay + new input)
+    I_syn = I_syn * np.exp(-dt / tau_input) + signal  
+
+    # If in refractory period, force membrane potential to reset value and decrement counter
+    if refrac_counter > 0:
+        new_p = v_reset
+        new_refrac_counter = refrac_counter - 1
+        fire = False  # Neuron cannot fire during absolute refractory period
+    else:
+        # Update membrane potential
+        dV = (- (p - v_rest) + I_syn) * (dt / tau)
+        new_p = p + dV
+
+        # Check for firing
+        fire = new_p >= v_threshold
+        if fire:
+            new_p = v_reset  # Reset membrane potential
+            new_refrac_counter = refrac_time  # Enter refractory period
+        else:
+            new_refrac_counter = 0  # No refractory period if no spike
+
+    return new_p, I_syn, fire, new_refrac_counter
