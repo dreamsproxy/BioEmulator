@@ -1,8 +1,9 @@
 import numpy as np
 from numba import njit
 
-@njit
+@njit()
 def step(params, spike):
+    params = params.astype(np.float64)
     p, dt, tau, v_rest, v_reset, v_threshold = params
     """
     Simulates a single time step of a spiking neuron model.
@@ -30,8 +31,12 @@ def step(params, spike):
     wp = new_p
     if fire:
         new_p = v_reset  # Reset the potential if spike occurs
-    
-    return wp, new_p
+        #print('Fire')
+    if wp < np.float64(1e-16) or np.isinf(wp):
+        wp = np.float64(1e-16)
+    if new_p < np.float64(1e-16) or np.isinf(new_p):
+        new_p = np.float64(1e-16)
+    return np.float64(wp), np.float64(new_p)
 
 def parse_params(params:dict):
     potential = params['potential']
