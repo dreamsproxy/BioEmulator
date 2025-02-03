@@ -4,7 +4,6 @@ import numpy as np
 import cv2
 from matplotlib import pyplot as plt
 from tqdm import tqdm
-from sklearn.preprocessing import MinMaxScaler
 
 class DataLoader:
     def __init__(self, mode='image') -> None:
