@@ -1,0 +1,10 @@
+numba
+pandas
+
+matplotlib
+plotly
+vispy
+pyqt6
+
+opencv-python
+opencv-contrib-python
