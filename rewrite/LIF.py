@@ -1,17 +1,19 @@
 import numpy as np
 from numba import njit
+from collections import OrderedDict
 
-def default_params():
-    params = {
-        'p'           : np.float64(-65.0),
-        'v_rest'      : np.float64(-65.0),
-        'dt'          : np.float64(0.100),
-        'v_reset'     : np.float64(-65.0),
-        'v_threshold' : np.float64(-52.0),
-        'tau'         : np.float64(100.0),
-        'tau_input'   : np.float64(2.000),
-    }
-    return
+def default_params() -> OrderedDict:
+    params = OrderedDict({
+        'p'           : np.float32(-65.0),
+        'v_rest'      : np.float32(-65.0),
+        'dt'          : np.float32(0.100),
+        'v_reset'     : np.float32(-65.0),
+        'v_threshold' : np.float32(-52.0),
+        'tau'         : np.float32(100.0),
+        'tau_input'   : np.float32(2.000),
+        'refrac'      : int(0)
+    })
+    return params
 
 @njit
 def step(params, I_syn, signal, refrac_counter):
