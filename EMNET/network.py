@@ -87,7 +87,7 @@ class Cell:
             y = [y / self.n_neighbors for i in range(6)]
         if self.cell_signal_type == 0:
             return y
-        y[]
+        #y[]
 
 c = Cell('0', 6, 4, 1)
 y = c.step(np.random.normal(0.0, 1.0, 6))
